@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-labelledby="title">
+  <title id="title">Pastel faceted crystal</title>
+  <rect width="600" height="600" fill="none"/>
+  <g filter="url(#softShadow)">
+    <path d="M300 54 462 168 406 504 300 568 194 504 138 168Z" fill="#cbb8ee"/>
+    <path d="M300 54 220 168 300 214 380 168Z" fill="#efe8ff"/>
+    <path d="M138 168 220 168 194 504Z" fill="#9fdccb"/>
+    <path d="M462 168 380 168 406 504Z" fill="#78c5b0"/>
+    <path d="M220 168 300 214 300 568 194 504Z" fill="#b99ee0"/>
+    <path d="M380 168 300 214 300 568 406 504Z" fill="#8d6ec0"/>
+    <path d="M220 168 138 168 300 54Z" fill="#dcd0f6" opacity="0.92"/>
+    <path d="M380 168 462 168 300 54Z" fill="#b5a2e0" opacity="0.94"/>
+    <path d="M194 504 300 568 300 214Z" fill="#d8c8f2" opacity="0.9"/>
+    <path d="M406 504 300 568 300 214Z" fill="#6fbda8" opacity="0.82"/>
+    <path d="M300 54 462 168 406 504 300 568 194 504 138 168Z" fill="none" stroke="#f7f0ff" stroke-width="10" stroke-linejoin="round" opacity="0.82"/>
+    <path d="M220 168h160M300 54v514M138 168l162 46 162-46M194 504l106-290 106 290" fill="none" stroke="#f7f0ff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/>
+  </g>
+  <defs>
+    <filter id="softShadow" x="10%" y="4%" width="80%" height="96%">
+      <feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#1f1730" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+</svg>

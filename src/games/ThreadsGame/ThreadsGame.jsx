@@ -1,12 +1,12 @@
 import { useMemo, useRef, useState } from 'react';
 
 const THREADS = [
-  { id: 'amethyst', color: '#c8b6e8', start: { x: 14, y: 18 }, end: { x: 86, y: 82 } },
-  { id: 'gold', color: '#d8b46a', start: { x: 86, y: 18 }, end: { x: 14, y: 82 } },
-  { id: 'emerald', color: '#4fa58a', start: { x: 12, y: 50 }, end: { x: 88, y: 50 } },
-  { id: 'rose', color: '#e879a4', start: { x: 28, y: 86 }, end: { x: 74, y: 14 } },
-  { id: 'violet', color: '#8e6bae', start: { x: 72, y: 88 }, end: { x: 26, y: 12 } },
-  { id: 'sky', color: '#88d7d1', start: { x: 50, y: 10 }, end: { x: 50, y: 90 } },
+  { id: 'amethyst', color: '#bfaee0', start: { x: 14, y: 18 }, end: { x: 86, y: 82 } },
+  { id: 'gold', color: '#d2b874', start: { x: 86, y: 18 }, end: { x: 14, y: 82 } },
+  { id: 'emerald', color: '#75b9a4', start: { x: 12, y: 50 }, end: { x: 88, y: 50 } },
+  { id: 'rose', color: '#d98cae', start: { x: 28, y: 86 }, end: { x: 74, y: 14 } },
+  { id: 'violet', color: '#9d82bf', start: { x: 72, y: 88 }, end: { x: 26, y: 12 } },
+  { id: 'sky', color: '#96d3cf', start: { x: 50, y: 10 }, end: { x: 50, y: 90 } },
 ];
 
 const WIN_DELAY = 900;
@@ -108,12 +108,10 @@ export function ThreadsGame({ game, onComplete }) {
         onPointerLeave={finishDrag}
         onPointerCancel={finishDrag}
       >
-        <defs>
-          <filter id="threadGlow"><feGaussianBlur stdDeviation="1.2" result="blur" /><feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
-        </defs>
         {threads.map((thread) => (
           <g key={thread.id} className="thread-line" style={{ '--thread': thread.color }}>
-            <line x1={thread.start.x} y1={thread.start.y} x2={thread.end.x} y2={thread.end.y} />
+            <line className="thread-strand" x1={thread.start.x} y1={thread.start.y} x2={thread.end.x} y2={thread.end.y} />
+            <line className="thread-highlight" x1={thread.start.x} y1={thread.start.y} x2={thread.end.x} y2={thread.end.y} />
           </g>
         ))}
         {threads.flatMap((thread) => ['start', 'end'].map((end) => (
@@ -122,7 +120,7 @@ export function ThreadsGame({ game, onComplete }) {
             className="thread-handle"
             cx={thread[end].x}
             cy={thread[end].y}
-            r="5.8"
+            r="4.4"
             fill={thread.color}
             onPointerDown={(event) => {
               if (won) return;
