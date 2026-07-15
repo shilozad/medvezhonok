@@ -8,7 +8,13 @@ import './styles/global.css';
 
 const basePath = new URL(import.meta.env.BASE_URL, window.location.origin).pathname.replace(/\/$/, '');
 
-function toAppPath(pathname = window.location.pathname) {
+function getPathname(path = window.location.pathname) {
+  return new URL(path, window.location.origin).pathname;
+}
+
+function toAppPath(path = window.location.pathname) {
+  const pathname = getPathname(path);
+
   if (basePath && pathname.startsWith(`${basePath}/`)) {
     return pathname.slice(basePath.length) || '/';
   }
@@ -30,14 +36,14 @@ function getInitialPath() {
   return window.location.pathname;
 }
 
-function getRoute(pathname = window.location.pathname) {
-  const path = toAppPath(pathname);
+function getRoute(path = window.location.pathname) {
+  const appPath = toAppPath(path);
 
-  if (path === '/final') {
+  if (appPath === '/final') {
     return { name: 'final' };
   }
 
-  const gameMatch = path.match(/^\/game\/(\d)$/);
+  const gameMatch = appPath.match(/^\/game\/(\d)$/);
   if (gameMatch) {
     return { name: 'game', gameNumber: Number(gameMatch[1]) };
   }
