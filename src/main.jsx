@@ -6,8 +6,32 @@ import { GamePage } from './pages/GamePage/GamePage';
 import { FinalPage } from './pages/FinalPage/FinalPage';
 import './styles/global.css';
 
-function getRoute() {
-  const path = window.location.pathname;
+const basePath = new URL(import.meta.env.BASE_URL, window.location.origin).pathname.replace(/\/$/, '');
+
+function toAppPath(pathname = window.location.pathname) {
+  if (basePath && pathname.startsWith(`${basePath}/`)) {
+    return pathname.slice(basePath.length) || '/';
+  }
+
+  if (basePath && pathname === basePath) {
+    return '/';
+  }
+
+  return pathname;
+}
+
+function getInitialPath() {
+  const redirectedPath = sessionStorage.getItem('spa-redirect');
+  if (redirectedPath) {
+    sessionStorage.removeItem('spa-redirect');
+    return redirectedPath;
+  }
+
+  return window.location.pathname;
+}
+
+function getRoute(pathname = window.location.pathname) {
+  const path = toAppPath(pathname);
 
   if (path === '/final') {
     return { name: 'final' };
@@ -25,9 +49,21 @@ function App() {
   const [route, setRoute] = useState(getRoute);
 
   const navigate = (path) => {
-    window.history.pushState({}, '', path);
-    setRoute(getRoute());
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    const targetPath = `${basePath}${normalizedPath}` || '/';
+    window.history.pushState({}, '', targetPath);
+    setRoute(getRoute(targetPath));
   };
+
+  React.useEffect(() => {
+    const initialPath = getInitialPath();
+    if (initialPath !== window.location.pathname) {
+      const appPath = toAppPath(initialPath);
+      const targetPath = `${basePath}${appPath}` || '/';
+      window.history.replaceState({}, '', targetPath);
+      setRoute(getRoute(targetPath));
+    }
+  }, []);
 
   React.useEffect(() => {
     const onPopState = () => setRoute(getRoute());

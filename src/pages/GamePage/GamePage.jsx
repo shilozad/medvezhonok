@@ -63,11 +63,11 @@ export function GamePage({ gameNumber, navigate }) {
       <GameHeader game={game} completed={completed} />
       <CurrentGame game={game} onComplete={completeGame} />
       <Button variant="ghost" onClick={() => navigate('/')}>Вернуться на главную</Button>
-      {victoryLetter && (
+      {victory && (
         <VictoryModal
-          letter={victoryLetter}
-          title={victoryTexts[game.id]?.title}
-          text={victoryTexts[game.id]?.text}
+          letter={victory.letter}
+          title={victory.title || victoryTexts[game.id]?.title}
+          text={victory.text || victoryTexts[game.id]?.text}
           onNext={goNext}
           nextLabel={game.number === 4 ? 'К финалу' : 'К следующему ключу'}
         />
