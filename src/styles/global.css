@@ -114,6 +114,7 @@ p { color: var(--muted); line-height: 1.65; }
 
 .mini-instruction, .crystal-hint { margin: 0 auto 16px; color: var(--muted); line-height: 1.5; font-size: 0.95rem; }
 .cats-board, .crystal-board { display: grid; gap: 8px; margin: 0 auto; touch-action: manipulation; }
+.crystal-board { --crystal-gap: 4px; gap: var(--crystal-gap); }
 .cats-board { grid-template-columns: repeat(4, minmax(54px, 1fr)); }
 .puzzle-cell, .crystal-piece { min-height: 64px; border: 1px solid rgba(200,182,232,0.22); border-radius: 18px; background: rgba(248,243,255,0.07); color: var(--text); cursor: pointer; transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease; }
 .puzzle-cell:active, .crystal-piece:active { transform: scale(0.98); }
@@ -135,20 +136,37 @@ p { color: var(--muted); line-height: 1.65; }
 .hearts span:nth-child(2) { animation-delay: 0.2s; }
 .hearts span:nth-child(3) { animation-delay: 0.4s; }
 
-.crystal-board { grid-template-columns: repeat(3, minmax(76px, 1fr)); width: min(100%, 310px); padding: 10px; border-radius: 26px; background: radial-gradient(circle, rgba(200,182,232,0.14), rgba(248,243,255,0.04)); }
-.crystal-piece { min-height: 86px; background:
-  radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255,255,255,0.95) 0 8%, rgba(157,224,255,0.88) 9% 18%, rgba(142,107,174,0.84) 19% 44%, rgba(55,42,84,0.9) 45%),
-  linear-gradient(135deg, rgba(255,255,255,0.18), rgba(216,180,106,0.1));
+.crystal-board {
+  grid-template-columns: repeat(3, minmax(76px, 1fr));
+  width: min(100%, 310px);
+  padding: 8px;
+  border-radius: 24px;
+  background: radial-gradient(circle, rgba(200,182,232,0.14), rgba(248,243,255,0.04));
 }
-.piece-0 { --x: 95%; --y: 95%; border-radius: 26px 10px 14px 10px; }
-.piece-1 { --x: 50%; --y: 95%; border-radius: 10px 10px 18px 18px; }
-.piece-2 { --x: 5%; --y: 95%; border-radius: 10px 26px 10px 14px; }
-.piece-3 { --x: 95%; --y: 50%; border-radius: 14px 18px 18px 14px; }
-.piece-4 { --x: 50%; --y: 50%; border-radius: 18px; box-shadow: inset 0 0 28px rgba(255,255,255,0.24); }
-.piece-5 { --x: 5%; --y: 50%; border-radius: 18px 14px 14px 18px; }
-.piece-6 { --x: 95%; --y: 5%; border-radius: 10px 14px 10px 26px; }
-.piece-7 { --x: 50%; --y: 5%; border-radius: 18px 18px 10px 10px; }
-.piece-8 { --x: 5%; --y: 5%; border-radius: 14px 10px 26px 10px; }
+.crystal-game.is-won .crystal-board { --crystal-gap: 0px; padding: 6px; }
+.crystal-piece {
+  min-height: 86px;
+  border-radius: 10px;
+  border-color: rgba(248,243,255,0.24);
+  background-image: url('/medvezhonok/images/crystal.svg');
+  background-repeat: no-repeat;
+  background-size: calc(300% + (var(--crystal-gap) * 2)) calc(300% + (var(--crystal-gap) * 2));
+  box-shadow: inset 0 0 0 1px rgba(31,23,48,0.14);
+}
+.piece-0 { background-position: 0% 0%; border-radius: 18px 8px 8px 8px; }
+.piece-1 { background-position: 50% 0%; border-radius: 8px; }
+.piece-2 { background-position: 100% 0%; border-radius: 8px 18px 8px 8px; }
+.piece-3 { background-position: 0% 50%; border-radius: 8px; }
+.piece-4 { background-position: 50% 50%; border-radius: 8px; box-shadow: inset 0 0 20px rgba(255,255,255,0.18); }
+.piece-5 { background-position: 100% 50%; border-radius: 8px; }
+.piece-6 { background-position: 0% 100%; border-radius: 8px 8px 8px 18px; }
+.piece-7 { background-position: 50% 100%; border-radius: 8px; }
+.piece-8 { background-position: 100% 100%; border-radius: 8px 8px 18px 8px; }
+.crystal-game.is-won .crystal-piece { border-color: rgba(248,243,255,0.12); border-radius: 0; box-shadow: none; }
+.crystal-game.is-won .piece-0 { border-top-left-radius: 18px; }
+.crystal-game.is-won .piece-2 { border-top-right-radius: 18px; }
+.crystal-game.is-won .piece-6 { border-bottom-left-radius: 18px; }
+.crystal-game.is-won .piece-8 { border-bottom-right-radius: 18px; }
 .magic-burst { margin: 18px auto 0; color: var(--gold); font-size: 2rem; animation: softGlow 1.2s ease-in-out infinite; }
 
 .found-letters { display: flex; justify-content: center; gap: 12px; margin: 24px 0; }
@@ -197,24 +215,33 @@ p { color: var(--muted); line-height: 1.65; }
 
 .thread-line { pointer-events: none; }
 .thread-line line {
-  stroke: var(--thread);
-  stroke-width: 6.5;
   stroke-linecap: round;
-  filter: drop-shadow(0 0 7px color-mix(in srgb, var(--thread) 54%, transparent));
+  stroke-linejoin: round;
   transition: stroke-width 220ms ease, filter 220ms ease;
+}
+.thread-strand {
+  stroke: var(--thread);
+  stroke-width: 2.8;
+  filter: drop-shadow(0 1px 2px rgba(18,12,31,0.34));
+}
+.thread-highlight {
+  stroke: rgba(248,243,255,0.42);
+  stroke-width: 0.85;
+  filter: none;
 }
 
 .thread-handle {
   position: relative;
   z-index: 2;
   stroke: rgba(248,243,255,0.9);
-  stroke-width: 1.6;
+  stroke-width: 1.2;
   cursor: grab;
-  filter: drop-shadow(0 5px 8px rgba(18,12,31,0.45));
+  filter: drop-shadow(0 3px 5px rgba(18,12,31,0.38));
   touch-action: none;
 }
 .thread-handle:active { cursor: grabbing; }
-.threads-game.is-won .thread-line line { stroke-width: 7.5; filter: drop-shadow(0 0 12px rgba(216,180,106,0.5)); }
+.threads-game.is-won .thread-strand { stroke-width: 3.2; filter: drop-shadow(0 1px 3px rgba(216,180,106,0.28)); }
+.threads-game.is-won .thread-highlight { stroke-width: 0.95; }
 .celebration-particles { position: absolute; inset: 0; pointer-events: none; }
 .celebration-particles span { position: absolute; left: 50%; top: 65%; width: 5px; height: 5px; border-radius: 50%; background: var(--lavender); animation: particle 1.2s ease-out both; transform: rotate(calc(var(--i) * 20deg)) translateY(-10px); }
 
