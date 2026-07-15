@@ -169,3 +169,129 @@ p { color: var(--muted); line-height: 1.65; }
   .crystal-board { grid-template-columns: repeat(3, minmax(64px, 1fr)); }
   .crystal-piece { min-height: 74px; }
 }
+
+.threads-game,
+.flower-game { position: relative; overflow: hidden; }
+
+.threads-status,
+.flower-message { margin: 10px auto 14px; color: var(--gold); font-weight: 800; }
+
+.threads-board {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: min(100%, 370px);
+  aspect-ratio: 1;
+  min-height: 280px;
+  margin: 18px auto 0;
+  border: 1px solid rgba(200,182,232,0.26);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 24% 20%, rgba(200,182,232,0.16), transparent 30%),
+    radial-gradient(circle at 76% 82%, rgba(79,165,138,0.14), transparent 28%),
+    rgba(31, 23, 48, 0.46);
+  box-shadow: inset 0 0 28px rgba(18,12,31,0.28), 0 18px 40px rgba(18,12,31,0.2);
+  touch-action: none;
+  overflow: visible;
+}
+
+.thread-line { pointer-events: none; }
+.thread-line line {
+  stroke: var(--thread);
+  stroke-width: 6.5;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 7px color-mix(in srgb, var(--thread) 54%, transparent));
+  transition: stroke-width 220ms ease, filter 220ms ease;
+}
+
+.thread-handle {
+  position: relative;
+  z-index: 2;
+  stroke: rgba(248,243,255,0.9);
+  stroke-width: 1.6;
+  cursor: grab;
+  filter: drop-shadow(0 5px 8px rgba(18,12,31,0.45));
+  touch-action: none;
+}
+.thread-handle:active { cursor: grabbing; }
+.threads-game.is-won .thread-line line { stroke-width: 7.5; filter: drop-shadow(0 0 12px rgba(216,180,106,0.5)); }
+.celebration-particles { position: absolute; inset: 0; pointer-events: none; }
+.celebration-particles span { position: absolute; left: 50%; top: 65%; width: 5px; height: 5px; border-radius: 50%; background: var(--lavender); animation: particle 1.2s ease-out both; transform: rotate(calc(var(--i) * 20deg)) translateY(-10px); }
+
+.modal-backdrop { z-index: 1000; pointer-events: auto; }
+.victory-modal { z-index: 1001; pointer-events: auto; }
+.victory-modal .button { pointer-events: auto; }
+
+.flower-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 10px auto 4px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  color: var(--text);
+  background: rgba(248,243,255,0.08);
+  border: 1px solid rgba(216,180,106,0.24);
+}
+.flower-score strong { color: var(--gold); }
+.flower-message { min-height: 1.5em; font-size: 0.92rem; }
+
+.flower-board {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 7px;
+  width: min(100%, 372px);
+  aspect-ratio: 1;
+  margin: 14px auto 0;
+  padding: 10px;
+  border-radius: 28px;
+  border: 1px solid rgba(200,182,232,0.24);
+  background:
+    radial-gradient(circle at 50% 20%, rgba(200,182,232,0.14), transparent 42%),
+    linear-gradient(160deg, rgba(31,23,48,0.48), rgba(79,165,138,0.12));
+  box-shadow: inset 0 0 30px rgba(18,12,31,0.24), 0 18px 38px rgba(18,12,31,0.18);
+  touch-action: manipulation;
+}
+
+.flower-cell {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid rgba(200,182,232,0.22);
+  border-radius: 15px;
+  color: var(--text);
+  background: linear-gradient(145deg, rgba(248,243,255,0.14), rgba(248,243,255,0.05));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+  cursor: pointer;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, opacity 220ms ease, background 180ms ease;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.flower-cell span { display: block; font-size: clamp(1.45rem, 7.8vw, 2.15rem); line-height: 1; transition: transform 180ms ease, opacity 220ms ease; }
+.flower-cell:hover:not(:disabled),
+.flower-cell:focus-visible { border-color: rgba(216,180,106,0.72); box-shadow: 0 0 0 3px rgba(216,180,106,0.13); outline: none; }
+.flower-cell:active:not(:disabled) { transform: scale(0.96); }
+.flower-cell.is-selected { border-color: var(--gold); background: rgba(216,180,106,0.16); box-shadow: 0 0 0 4px rgba(216,180,106,0.18), 0 0 18px rgba(200,182,232,0.24); }
+.flower-cell.is-selected span { transform: scale(1.08); }
+.flower-cell.is-swapping span { transform: scale(0.92); }
+.flower-cell.is-matched { border-color: rgba(200,182,232,0.74); background: rgba(200,182,232,0.18); }
+.flower-cell.is-matched span { animation: flowerMatch 260ms ease both; }
+.flower-cell:disabled { cursor: default; }
+.flower-board.is-processing .flower-cell:not(.is-matched) { opacity: 0.92; }
+.bouquet { margin: 14px auto 0; font-size: 2.2rem; pointer-events: none; }
+
+@keyframes flowerMatch {
+  0% { opacity: 1; transform: scale(1); }
+  55% { opacity: 0.86; transform: scale(1.22); }
+  100% { opacity: 0; transform: scale(0.62); }
+}
+
+@media (max-width: 390px) {
+  .threads-board { min-height: 250px; }
+  .flower-board { gap: 5px; padding: 8px; }
+  .flower-cell { border-radius: 12px; }
+}

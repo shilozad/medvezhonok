@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 const THREADS = [
   { id: 'amethyst', color: '#c8b6e8', start: { x: 14, y: 18 }, end: { x: 86, y: 82 } },
@@ -11,13 +11,37 @@ const THREADS = [
 
 const WIN_DELAY = 900;
 
-function ccw(a, b, c) {
-  return (c.y - a.y) * (b.x - a.x) > (b.y - a.y) * (c.x - a.x);
+function orientation(a, b, c) {
+  return Math.sign((b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y));
+}
+
+function samePoint(a, b) {
+  return Math.abs(a.x - b.x) < 0.001 && Math.abs(a.y - b.y) < 0.001;
+}
+
+function onSegment(a, b, c) {
+  return b.x <= Math.max(a.x, c.x) && b.x >= Math.min(a.x, c.x)
+    && b.y <= Math.max(a.y, c.y) && b.y >= Math.min(a.y, c.y);
 }
 
 function intersects(first, second) {
-  return ccw(first.start, second.start, second.end) !== ccw(first.end, second.start, second.end)
-    && ccw(first.start, first.end, second.start) !== ccw(first.start, first.end, second.end);
+  const a = first.start;
+  const b = first.end;
+  const c = second.start;
+  const d = second.end;
+
+  if ([a, b].some((point) => samePoint(point, c) || samePoint(point, d))) return false;
+
+  const o1 = orientation(a, b, c);
+  const o2 = orientation(a, b, d);
+  const o3 = orientation(c, d, a);
+  const o4 = orientation(c, d, b);
+
+  if (o1 !== o2 && o3 !== o4) return true;
+  if (o1 === 0 && onSegment(a, c, b)) return true;
+  if (o2 === 0 && onSegment(a, d, b)) return true;
+  if (o3 === 0 && onSegment(c, a, d)) return true;
+  return o4 === 0 && onSegment(c, b, d);
 }
 
 function hasCrossings(threads) {
@@ -41,20 +65,24 @@ export function ThreadsGame({ game, onComplete }) {
   const [threads, setThreads] = useState(THREADS);
   const [dragging, setDragging] = useState(null);
   const [won, setWon] = useState(false);
+  const completedRef = useRef(false);
   const crossings = useMemo(() => hasCrossings(threads), [threads]);
 
   const moveEnd = (event) => {
     if (!dragging || won) return;
+    event.preventDefault();
     const point = pointerToPercent(event, event.currentTarget);
     setThreads((current) => current.map((thread) => (
       thread.id === dragging.id ? { ...thread, [dragging.end]: point } : thread
     )));
   };
 
-  const finishDrag = () => {
+  const finishDrag = (event) => {
+    event?.preventDefault();
     setDragging(null);
     setThreads((current) => {
-      if (!hasCrossings(current) && !won) {
+      if (!hasCrossings(current) && !completedRef.current) {
+        completedRef.current = true;
         setWon(true);
         window.setTimeout(() => onComplete(game.letter, {
           title: 'Первый ключ найден',
@@ -77,6 +105,7 @@ export function ThreadsGame({ game, onComplete }) {
         aria-label="Игровое поле с цветными нитями"
         onPointerMove={moveEnd}
         onPointerUp={finishDrag}
+        onPointerLeave={finishDrag}
         onPointerCancel={finishDrag}
       >
         <defs>
@@ -96,6 +125,8 @@ export function ThreadsGame({ game, onComplete }) {
             r="5.8"
             fill={thread.color}
             onPointerDown={(event) => {
+              if (won) return;
+              event.preventDefault();
               event.currentTarget.setPointerCapture(event.pointerId);
               setDragging({ id: thread.id, end });
             }}
