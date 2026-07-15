@@ -42,21 +42,18 @@ export function GamePage({ gameNumber, navigate }) {
   const completed = isGameCompleted(game.id, progress);
 
   const completeGame = (letter, modal = {}) => {
+    if (victory) return;
     const nextProgress = saveLetter(game.id, letter);
     setProgress(nextProgress);
     setVictory({ letter, ...modal });
   };
 
   const goNext = () => {
-    if (victory) {
-      localStorage.setItem(game.id, 'true');
-      localStorage.setItem(`letter${game.number}`, victory.letter);
-    }
-    const nextGame = games.find((item) => !nextProgressHas(item.id));
+    const nextProgress = getProgress();
+    const nextGame = games.find((item) => !isGameCompleted(item.id, nextProgress));
+    setVictory(null);
     navigate(nextGame ? nextGame.path : '/final');
   };
-
-  const nextProgressHas = (gameId) => Boolean(getProgress()[gameId]);
 
   return (
     <div className="game-page">
