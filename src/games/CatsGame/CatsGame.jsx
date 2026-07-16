@@ -53,6 +53,7 @@ export function CatsGame({ game, onComplete }) {
 
   return (
     <section className={`game-card cats-game fade-up ${won || allHome ? 'is-won' : ''}`}>
+      <h2>{game.cardTitle}</h2>
       <div className="mini-instruction">Выбери котика и тапай по соседней клетке, чтобы довести каждого к своему домику.</div>
       <div className="cats-board" role="grid" aria-label="Поле 4 на 4 для котиков">
         {Array.from({ length: 16 }).map((_, cell) => {

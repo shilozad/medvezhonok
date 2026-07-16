@@ -18,6 +18,7 @@ export function Home({ navigate }) {
   return (
     <section className="hero page-card fade-up">
       <p className="eyebrow">Квест-подарок</p>
+      <p className="eyebrow">{homeText.dedication}</p>
       <h1>{homeText.title}</h1>
       <p className="hero-subtitle">{homeText.subtitle}</p>
       <div className="keys-row" aria-label="Прогресс ключей">
