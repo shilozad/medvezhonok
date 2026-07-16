@@ -63,20 +63,44 @@ button { font: inherit; }
 .hero h1 { margin-top: 0; white-space: pre-line; animation: heroTitleIn 680ms ease both; }
 .hero h2 { margin: 0 0 14px; font-size: clamp(1.7rem, 8vw, 2.65rem); line-height: 1; letter-spacing: -0.05em; }
 .hero .hero-title {
-  margin: 0 auto 12px;
-  font-size: clamp(2.35rem, 11.2vw, 3.55rem);
-  line-height: 0.98;
+  display: grid;
+  gap: 0.02em;
+  margin: 0 auto 20px;
+  font-size: clamp(2.25rem, 10.6vw, 3.45rem);
+  line-height: 0.99;
   letter-spacing: -0.055em;
-  text-shadow: 0 0 18px rgba(200, 182, 232, 0.38), 0 0 34px rgba(216, 139, 186, 0.2);
+  color: #fff7ff;
+  background: linear-gradient(180deg, #fff7ff 10%, #f6ebff 48%, #e8d6ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 12px rgba(232, 214, 255, 0.22), 0 0 24px rgba(229, 166, 209, 0.16);
+  filter: drop-shadow(0 4px 10px rgba(37, 24, 55, 0.2));
 }
-.hero-divider { display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; color: var(--gold); opacity: 0.86; }
+.hero-title-line { display: inline-flex; align-items: baseline; justify-content: center; gap: 0.11em; }
+.hero-heart {
+  display: inline-block;
+  font-size: 0.58em;
+  line-height: 1;
+  letter-spacing: 0;
+  -webkit-text-fill-color: initial;
+  filter: drop-shadow(0 0 8px rgba(255, 171, 206, 0.42));
+  transform: translateY(-0.06em);
+}
+.hero-divider { display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; color: var(--gold); opacity: 0.78; }
 .hero-divider::before, .hero-divider::after { content: ''; width: min(88px, 25vw); height: 1px; background: linear-gradient(90deg, transparent, rgba(216,180,106,0.78)); }
 .hero-divider::after { background: linear-gradient(90deg, rgba(216,180,106,0.78), transparent); }
 .hero-divider span { width: 9px; height: 9px; margin: 0 10px; border: 1px solid currentColor; transform: rotate(45deg); background: rgba(216,180,106,0.22); box-shadow: 0 0 14px rgba(216,180,106,0.34); }
-.quest-title { color: var(--gold); font-size: clamp(1.35rem, 6.2vw, 2rem); letter-spacing: -0.02em; text-shadow: 0 0 16px rgba(216,180,106,0.24); }
+.quest-title {
+  color: #e3c879;
+  font-size: clamp(1.18rem, 5.1vw, 1.72rem);
+  font-weight: 650;
+  letter-spacing: 0.075em;
+  text-shadow: 0 0 12px rgba(227, 200, 121, 0.18);
+}
 .game-header h1 { font-size: clamp(2rem, 9vw, 3.25rem); }
 p { color: var(--muted); line-height: 1.65; }
-.hero-subtitle { max-width: 360px; white-space: pre-line; margin: 0 auto 18px; color: rgba(248, 243, 255, 0.82); line-height: 1.56; }
+.hero-subtitle { max-width: 360px; white-space: pre-line; margin: 0 auto 20px; color: rgba(248, 243, 255, 0.76); line-height: 1.72; font-weight: 400; }
 .eyebrow { margin: 0; color: var(--gold); text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.74rem; font-weight: 800; }
 
 .button {
@@ -102,17 +126,18 @@ p { color: var(--muted); line-height: 1.65; }
 .key-chip.is-open, .letter-badge { color: #1f1730; background: linear-gradient(135deg, var(--lavender), var(--gold)); }
 
 
-.artifact-keys { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(6px, 2.4vw, 12px); align-items: end; margin: 4px auto 12px; max-width: 380px; }
-.artifact-key { --key-main: var(--lavender); --key-deep: #8e6bae; position: relative; display: grid; place-items: center; min-width: 0; opacity: 0; animation: keyAppear 620ms ease both; animation-delay: calc(140ms + var(--key-index) * 90ms); }
-.artifact-key svg { width: min(100%, 78px); height: auto; overflow: visible; filter: drop-shadow(0 0 9px color-mix(in srgb, var(--key-main) 42%, transparent)); animation: keyGlow 4s ease-in-out infinite; }
-.artifact-body { fill: url(#threads-shine); stroke: rgba(255,255,255,0.52); stroke-width: 1.2; }
+.artifact-keys { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(7px, 2.8vw, 14px); align-items: end; margin: 8px auto 24px; max-width: 392px; }
+.artifact-key { --key-main: var(--lavender); --key-deep: #8e6bae; position: relative; display: grid; place-items: center; min-width: 0; opacity: 0; animation: keyAppear 560ms cubic-bezier(0.2, 0.72, 0.22, 1) both; animation-delay: calc(120ms + var(--key-index) * 100ms); }
+.artifact-key svg { width: min(100%, 82px); height: auto; overflow: visible; filter: drop-shadow(0 0 8px color-mix(in srgb, var(--key-main) 34%, transparent)); }
+.artifact-body { fill: url(#threads-shine); stroke: rgba(255,255,255,0.46); stroke-width: 1.05; }
 .key-flowers .artifact-body { fill: url(#flowers-shine); }
 .key-cats .artifact-body { fill: url(#cats-shine); }
 .key-crystal .artifact-body { fill: url(#crystal-shine); }
-.artifact-aura { fill: color-mix(in srgb, var(--key-main) 22%, transparent); }
-.artifact-highlight, .artifact-symbol { fill: none; stroke: rgba(255,255,255,0.82); stroke-width: 2.8; stroke-linecap: round; stroke-linejoin: round; }
-.artifact-symbol { stroke-width: 2.3; }
-.artifact-symbol circle, .artifact-symbol path:first-child { fill: color-mix(in srgb, var(--key-main) 18%, transparent); }
+.artifact-aura { fill: color-mix(in srgb, var(--key-main) 12%, transparent); }
+.artifact-highlight, .artifact-filigree, .artifact-symbol { fill: none; stroke: rgba(255,255,255,0.76); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.artifact-filigree { stroke: color-mix(in srgb, var(--key-main) 62%, rgba(255,255,255,0.52)); stroke-width: 1.2; opacity: 0.7; }
+.artifact-symbol { stroke-width: 2.05; }
+.artifact-symbol circle, .artifact-symbol path:first-child { fill: color-mix(in srgb, var(--key-main) 12%, transparent); }
 .key-threads { --key-main: var(--lavender); --key-deep: #7c5fa3; }
 .key-flowers { --key-main: var(--emerald); --key-deep: #2e745f; }
 .key-cats { --key-main: var(--gold); --key-deep: #b88434; }
@@ -142,8 +167,7 @@ p { color: var(--muted); line-height: 1.65; }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes heroTitleIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes dissolve { from { opacity: 0; } to { opacity: 1; } }
-@keyframes keyAppear { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes keyGlow { 0%, 100% { filter: drop-shadow(0 0 7px color-mix(in srgb, var(--key-main) 35%, transparent)); } 50% { filter: drop-shadow(0 0 13px color-mix(in srgb, var(--key-main) 52%, transparent)); } }
+@keyframes keyAppear { from { opacity: 0; transform: translateY(12px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes softGlow { 0%, 100% { filter: drop-shadow(0 0 4px rgba(216,180,106,0.35)); } 50% { filter: drop-shadow(0 0 18px rgba(216,180,106,0.75)); } }
 @keyframes particle { 0% { opacity: 0; transform: rotate(calc(var(--i) * 26deg)) translate(0); } 20% { opacity: 1; } 100% { opacity: 0; transform: rotate(calc(var(--i) * 26deg)) translate(80px); } }
 
