@@ -60,6 +60,8 @@ button { font: inherit; }
 
 .page-card { padding: 34px 24px; text-align: center; }
 .hero h1, .final h1, .game-header h1 { margin: 8px 0 14px; font-size: clamp(2.25rem, 12vw, 4rem); line-height: 0.95; letter-spacing: -0.06em; }
+.hero h1 { margin-top: 0; white-space: pre-line; animation: heroTitleIn 680ms ease both; }
+.hero h2 { margin: 0 0 14px; font-size: clamp(1.7rem, 8vw, 2.65rem); line-height: 1; letter-spacing: -0.05em; }
 .game-header h1 { font-size: clamp(2rem, 9vw, 3.25rem); }
 p { color: var(--muted); line-height: 1.65; }
 .hero-subtitle { white-space: pre-line; margin: 0 auto 26px; }
@@ -103,6 +105,7 @@ p { color: var(--muted); line-height: 1.65; }
 .glow { animation: softGlow 3s ease-in-out infinite; }
 
 @keyframes fadeUp { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes heroTitleIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes dissolve { from { opacity: 0; } to { opacity: 1; } }
 @keyframes softGlow { 0%, 100% { filter: drop-shadow(0 0 4px rgba(216,180,106,0.35)); } 50% { filter: drop-shadow(0 0 18px rgba(216,180,106,0.75)); } }
 @keyframes particle { 0% { opacity: 0; transform: rotate(calc(var(--i) * 26deg)) translate(0); } 20% { opacity: 1; } 100% { opacity: 0; transform: rotate(calc(var(--i) * 26deg)) translate(80px); } }
