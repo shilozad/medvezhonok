@@ -43,7 +43,7 @@ export function CrystalGame({ game, onComplete }) {
           />
         ))}
       </div>
-      <div className="crystal-hint">Подсказка: острые лучи должны встретиться в сияющем центре.</div>
+      <div className="crystal-hint">{game.hint}</div>
       {won && <div className="magic-burst" aria-hidden="true">✦ ✨ ✦</div>}
     </section>
   );
