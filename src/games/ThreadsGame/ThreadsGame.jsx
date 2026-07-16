@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 const THREADS = [
   { id: 'amethyst', color: '#bfaee0', start: { x: 14, y: 18 }, end: { x: 86, y: 82 } },
@@ -10,6 +10,8 @@ const THREADS = [
 ];
 
 const WIN_DELAY = 900;
+const VIEWBOX_SIZE = 100;
+const HANDLE_RADIUS = 2.4;
 
 function orientation(a, b, c) {
   return Math.sign((b.y - a.y) * (c.x - b.x) - (b.x - a.x) * (c.y - b.y));
@@ -53,59 +55,152 @@ function hasCrossings(threads) {
   return false;
 }
 
-function pointerToPercent(event, element) {
-  const rect = element.getBoundingClientRect();
+function clampPoint(point) {
   return {
-    x: Math.max(7, Math.min(93, ((event.clientX - rect.left) / rect.width) * 100)),
-    y: Math.max(7, Math.min(93, ((event.clientY - rect.top) / rect.height) * 100)),
+    x: Math.max(HANDLE_RADIUS, Math.min(VIEWBOX_SIZE - HANDLE_RADIUS, point.x)),
+    y: Math.max(HANDLE_RADIUS, Math.min(VIEWBOX_SIZE - HANDLE_RADIUS, point.y)),
   };
+}
+
+function pointerToViewBoxPoint(event, rect) {
+  const scaleX = VIEWBOX_SIZE / rect.width;
+  const scaleY = VIEWBOX_SIZE / rect.height;
+
+  return clampPoint({
+    x: (event.clientX - rect.left) * scaleX,
+    y: (event.clientY - rect.top) * scaleY,
+  });
 }
 
 export function ThreadsGame({ game, onComplete }) {
   const [threads, setThreads] = useState(THREADS);
-  const [dragging, setDragging] = useState(null);
+  const [dragging, setDragging] = useState(false);
   const [won, setWon] = useState(false);
+  const boardRef = useRef(null);
+  const threadsRef = useRef(THREADS);
+  const activePointerIdRef = useRef(null);
+  const activeHandleRef = useRef(null);
+  const captureTargetRef = useRef(null);
+  const latestPointRef = useRef(null);
+  const animationFrameRef = useRef(null);
+  const boardRectRef = useRef(null);
   const completedRef = useRef(false);
   const crossings = useMemo(() => hasCrossings(threads), [threads]);
 
-  const moveEnd = (event) => {
-    if (!dragging || won) return;
-    event.preventDefault();
-    const point = pointerToPercent(event, event.currentTarget);
-    setThreads((current) => current.map((thread) => (
-      thread.id === dragging.id ? { ...thread, [dragging.end]: point } : thread
-    )));
-  };
+  const updateBoardRect = useCallback(() => {
+    if (boardRef.current) {
+      boardRectRef.current = boardRef.current.getBoundingClientRect();
+    }
+  }, []);
 
-  const finishDrag = (event) => {
+  const applyLatestPoint = useCallback(() => {
+    animationFrameRef.current = null;
+    const activeHandle = activeHandleRef.current;
+    const latestPoint = latestPointRef.current;
+
+    if (!activeHandle || !latestPoint) return threadsRef.current;
+
+    const nextThreads = threadsRef.current.map((thread) => (
+      thread.id === activeHandle.id ? { ...thread, [activeHandle.end]: latestPoint } : thread
+    ));
+
+    threadsRef.current = nextThreads;
+    setThreads(nextThreads);
+    return nextThreads;
+  }, []);
+
+  const schedulePointUpdate = useCallback(() => {
+    if (animationFrameRef.current !== null) return;
+    animationFrameRef.current = window.requestAnimationFrame(applyLatestPoint);
+  }, [applyLatestPoint]);
+
+  const completeIfSolved = useCallback((currentThreads) => {
+    if (!hasCrossings(currentThreads) && !completedRef.current) {
+      completedRef.current = true;
+      setWon(true);
+      window.setTimeout(() => onComplete(game.letter, {
+        title: 'Первый ключ найден',
+        text: 'Одна маленькая загадка разгадана.\nНо впереди ещё три испытания.',
+      }), WIN_DELAY);
+    }
+  }, [game.letter, onComplete]);
+
+  const startDrag = useCallback((event, id, end) => {
+    if (won || activePointerIdRef.current !== null) return;
+
+    event.preventDefault();
+    updateBoardRect();
+    activePointerIdRef.current = event.pointerId;
+    activeHandleRef.current = { id, end };
+    captureTargetRef.current = event.currentTarget;
+    latestPointRef.current = pointerToViewBoxPoint(event, boardRectRef.current);
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setDragging(true);
+    schedulePointUpdate();
+  }, [schedulePointUpdate, updateBoardRect, won]);
+
+  const moveEnd = useCallback((event) => {
+    if (event.pointerId !== activePointerIdRef.current || !activeHandleRef.current || won) return;
+
+    event.preventDefault();
+    latestPointRef.current = pointerToViewBoxPoint(event, boardRectRef.current);
+    schedulePointUpdate();
+  }, [schedulePointUpdate, won]);
+
+  const finishDrag = useCallback((event) => {
+    if (event && event.pointerId !== activePointerIdRef.current) return;
+
     event?.preventDefault();
-    setDragging(null);
-    setThreads((current) => {
-      if (!hasCrossings(current) && !completedRef.current) {
-        completedRef.current = true;
-        setWon(true);
-        window.setTimeout(() => onComplete(game.letter, {
-          title: 'Первый ключ найден',
-          text: 'Одна маленькая загадка разгадана.\nНо впереди ещё три испытания.',
-        }), WIN_DELAY);
+
+    const pointerId = activePointerIdRef.current;
+    const captureTarget = captureTargetRef.current;
+
+    if (animationFrameRef.current !== null) {
+      window.cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+
+    const currentThreads = applyLatestPoint();
+
+    if (captureTarget && pointerId !== null && captureTarget.hasPointerCapture(pointerId)) {
+      captureTarget.releasePointerCapture(pointerId);
+    }
+
+    activePointerIdRef.current = null;
+    activeHandleRef.current = null;
+    captureTargetRef.current = null;
+    latestPointRef.current = null;
+    setDragging(false);
+    completeIfSolved(currentThreads);
+  }, [applyLatestPoint, completeIfSolved]);
+
+  useEffect(() => {
+    updateBoardRect();
+
+    const resizeObserver = new ResizeObserver(updateBoardRect);
+    if (boardRef.current) resizeObserver.observe(boardRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+      if (animationFrameRef.current !== null) {
+        window.cancelAnimationFrame(animationFrameRef.current);
       }
-      return current;
-    });
-  };
+    };
+  }, [updateBoardRect]);
 
   return (
-    <section className={`game-card threads-game ${won ? 'is-won' : ''}`}>
+    <section className={`game-card threads-game ${won ? 'is-won' : ''} ${dragging ? 'is-dragging' : ''}`}>
       <p className="eyebrow">Запутанные нити</p>
       <p>Перетащи круглые концы нитей так, чтобы цветные линии больше не пересекались.</p>
       <div className="threads-status">{crossings ? 'Нити ещё запутаны' : 'Все нити свободны ✨'}</div>
       <svg
+        ref={boardRef}
         className="threads-board"
         viewBox="0 0 100 100"
         role="img"
         aria-label="Игровое поле с цветными нитями"
         onPointerMove={moveEnd}
         onPointerUp={finishDrag}
-        onPointerLeave={finishDrag}
         onPointerCancel={finishDrag}
       >
         {threads.map((thread) => (
@@ -115,20 +210,16 @@ export function ThreadsGame({ game, onComplete }) {
           </g>
         ))}
         {threads.flatMap((thread) => ['start', 'end'].map((end) => (
-          <circle
+          <g
             key={`${thread.id}-${end}`}
             className="thread-handle"
-            cx={thread[end].x}
-            cy={thread[end].y}
-            r="4.4"
-            fill={thread.color}
-            onPointerDown={(event) => {
-              if (won) return;
-              event.preventDefault();
-              event.currentTarget.setPointerCapture(event.pointerId);
-              setDragging({ id: thread.id, end });
-            }}
-          />
+            style={{ '--handle-color': thread.color }}
+            transform={`translate(${thread[end].x} ${thread[end].y})`}
+            onPointerDown={(event) => startDrag(event, thread.id, end)}
+          >
+            <circle className="thread-hit-area" r="6" />
+            <circle className="thread-dot" r={HANDLE_RADIUS} />
+          </g>
         )))}
       </svg>
       {won && <div className="celebration-particles" aria-hidden="true">{Array.from({ length: 18 }).map((_, index) => <span key={index} style={{ '--i': index }} />)}</div>}
