@@ -17,9 +17,8 @@ export function Home({ navigate }) {
 
   return (
     <section className="hero page-card fade-up">
-      <p className="eyebrow">Квест-подарок</p>
-      <p className="eyebrow">{homeText.dedication}</p>
-      <h1>{homeText.title}</h1>
+      <h1 className="hero-title">{homeText.dedication}</h1>
+      <h2>{homeText.title}</h2>
       <p className="hero-subtitle">{homeText.subtitle}</p>
       <div className="keys-row" aria-label="Прогресс ключей">
         {games.map((game) => (
