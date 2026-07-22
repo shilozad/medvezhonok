@@ -23,7 +23,8 @@ const cloneBoard = (board) => [...board];
 const areNeighbors = (a, b) => Math.abs(rowOf(a) - rowOf(b)) + Math.abs(colOf(a) - colOf(b)) === 1;
 
 export function findMatches(board) {
-  const matches = new Set();
+  const matchedCells = new Set();
+  let lineCount = 0;
 
   for (let row = 0; row < SIZE; row += 1) {
     let streak = [indexOf(row, 0)];
@@ -33,11 +34,17 @@ export function findMatches(board) {
       if (board[current] && board[current] === board[previous]) {
         streak.push(current);
       } else {
-        if (streak.length >= 3) streak.forEach((item) => matches.add(item));
+        if (streak.length >= 3) {
+          lineCount += 1;
+          streak.forEach((item) => matchedCells.add(item));
+        }
         streak = [current];
       }
     }
-    if (streak.length >= 3) streak.forEach((item) => matches.add(item));
+    if (streak.length >= 3) {
+      lineCount += 1;
+      streak.forEach((item) => matchedCells.add(item));
+    }
   }
 
   for (let col = 0; col < SIZE; col += 1) {
@@ -48,14 +55,20 @@ export function findMatches(board) {
       if (board[current] && board[current] === board[previous]) {
         streak.push(current);
       } else {
-        if (streak.length >= 3) streak.forEach((item) => matches.add(item));
+        if (streak.length >= 3) {
+          lineCount += 1;
+          streak.forEach((item) => matchedCells.add(item));
+        }
         streak = [current];
       }
     }
-    if (streak.length >= 3) streak.forEach((item) => matches.add(item));
+    if (streak.length >= 3) {
+      lineCount += 1;
+      streak.forEach((item) => matchedCells.add(item));
+    }
   }
 
-  return matches;
+  return { matchedCells, lineCount };
 }
 
 export function swapCells(board, first, second) {
@@ -73,7 +86,7 @@ export function hasPossibleMove(board) {
     if (row < SIZE - 1) neighbors.push(index + SIZE);
 
     for (const neighbor of neighbors) {
-      if (findMatches(swapCells(board, index, neighbor)).size > 0) return true;
+      if (findMatches(swapCells(board, index, neighbor)).lineCount > 0) return true;
     }
   }
   return false;
@@ -101,7 +114,7 @@ function generateCleanBoard() {
 export function generatePlayableBoard() {
   for (let attempt = 0; attempt < 120; attempt += 1) {
     const board = generateCleanBoard();
-    if (findMatches(board).size === 0 && hasPossibleMove(board)) return board;
+    if (findMatches(board).lineCount === 0 && hasPossibleMove(board)) return board;
   }
   return cloneBoard(FALLBACK_BOARD);
 }
@@ -109,7 +122,7 @@ export function generatePlayableBoard() {
 export function reshuffleBoard(board = []) {
   for (let attempt = 0; attempt < 80; attempt += 1) {
     const shuffled = cloneBoard(board.length ? board : generateCleanBoard()).sort(() => Math.random() - 0.5);
-    if (findMatches(shuffled).size === 0 && hasPossibleMove(shuffled)) return shuffled;
+    if (findMatches(shuffled).lineCount === 0 && hasPossibleMove(shuffled)) return shuffled;
   }
   return generatePlayableBoard();
 }
@@ -156,11 +169,11 @@ export function FlowerGame({ game, onComplete }) {
 
     while (true) {
       const matches = findMatches(currentBoard);
-      if (matches.size === 0) break;
-      setMatched(matches);
+      if (matches.lineCount === 0) break;
+      setMatched(matches.matchedCells);
       await new Promise((resolve) => { window.setTimeout(resolve, CASCADE_DELAY); });
-      nextScore += matches.size;
-      currentBoard = collapseAndFill(currentBoard, matches);
+      nextScore += matches.lineCount;
+      currentBoard = collapseAndFill(currentBoard, matches.matchedCells);
       setScore(nextScore);
       setBoard(currentBoard);
       setMatched(new Set());
@@ -205,7 +218,7 @@ export function FlowerGame({ game, onComplete }) {
     setSwapping(new Set([selected, index]));
     setBoard(swapped);
 
-    if (findMatches(swapped).size === 0) {
+    if (findMatches(swapped).lineCount === 0) {
       setMessage('Такой обмен не собирает три цветка. Попробуй другой.');
       setProcessing(true);
       window.setTimeout(() => {
